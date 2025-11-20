@@ -1,0 +1,5 @@
+{
+  "name": "T-album",
+  "description": "A vintage-styled travel album creator where a retro beeper device prints typewriter-style photo cards that can be connected on a corkboard.",
+  "requestFramePermissions": []
+}
