@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Camera, Send, X, Upload } from 'lucide-react';
 
 interface TypewriterMachineProps {
-  onPrint: (text: string, date: string, imageFile: File | null) => void;
+  onPrint: (text: string, date: string, imageFile: File | null, aspect: '1:1' | '16:9' | '9:16') => void;
   onClose: () => void;
 }
 
@@ -11,6 +11,7 @@ export const TypewriterMachine: React.FC<TypewriterMachineProps> = ({ onPrint, o
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [aspect, setAspect] = useState<'1:1' | '16:9' | '9:16'>('1:1');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,22 +20,42 @@ export const TypewriterMachine: React.FC<TypewriterMachineProps> = ({ onPrint, o
       setImageFile(file);
       const url = URL.createObjectURL(file);
       setImagePreview(url);
+      const img = new Image();
+      img.onload = () => {
+        const r = img.naturalWidth / img.naturalHeight;
+        const options: { label: '1:1' | '16:9' | '9:16'; value: number }[] = [
+          { label: '1:1', value: 1 },
+          { label: '16:9', value: 16 / 9 },
+          { label: '9:16', value: 9 / 16 },
+        ];
+        let best: '1:1' | '16:9' | '9:16' = '1:1';
+        let bestDiff = Infinity;
+        for (const opt of options) {
+          const diff = Math.abs(r - opt.value);
+          if (diff < bestDiff) {
+            bestDiff = diff;
+            best = opt.label;
+          }
+        }
+        setAspect(best);
+      };
+      img.src = url;
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text && !imageFile) return;
-    onPrint(text, date, imageFile);
-    // Reset
+    onPrint(text, date, imageFile, aspect);
     setText('');
     setImageFile(null);
     setImagePreview(null);
+    setAspect('1:1');
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="relative bg-stone-800 rounded-2xl p-1 shadow-2xl max-w-md w-full border-b-8 border-stone-900">
+      <div className="relative bg-stone-800 rounded-2xl p-1 shadow-2xl max-w-md w-full border-b-8 border-stone-900 max-h-[90vh] overflow-y-auto">
         {/* Device Casing Details */}
         <div className="absolute -top-2 left-4 w-20 h-1 bg-stone-600 rounded-full" />
         <div className="absolute top-4 right-4 flex gap-1">
@@ -43,7 +64,7 @@ export const TypewriterMachine: React.FC<TypewriterMachineProps> = ({ onPrint, o
         </div>
 
         {/* Main Interface Body */}
-        <div className="bg-[#2a2a2a] rounded-xl p-6 flex flex-col gap-4 border-2 border-stone-700 h-full">
+        <div className="bg-[#2a2a2a] rounded-xl p-6 flex flex-col gap-4 border-2 border-stone-700">
           
           {/* Header / Screen Label */}
           <div className="flex justify-between items-center text-stone-400 font-['VT323'] text-xl uppercase tracking-widest">
@@ -61,7 +82,9 @@ export const TypewriterMachine: React.FC<TypewriterMachineProps> = ({ onPrint, o
             {/* Image Preview in Screen */}
             {imagePreview && (
                <div className="mb-2 border-2 border-black/20 p-1 bg-black/5">
-                  <img src={imagePreview} alt="Preview" className="h-32 w-full object-cover grayscale opacity-80 mix-blend-multiply" />
+                  <div className="w-full" style={{ aspectRatio: aspect === '16:9' ? '16 / 9' : aspect === '9:16' ? '9 / 16' : '1 / 1' }}>
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover grayscale opacity-80 mix-blend-multiply" />
+                  </div>
                   <div className="flex justify-end">
                     <button 
                         type="button"

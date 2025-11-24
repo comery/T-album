@@ -11,6 +11,7 @@ export interface CardData {
   text: string;
   date: string;
   isTyping: boolean;
+  aspect: '1:1' | '16:9' | '9:16';
 }
 
 export interface Connection {

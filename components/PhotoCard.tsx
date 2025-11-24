@@ -70,8 +70,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
       {/* Tape effect at top */}
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-yellow-200/60 backdrop-blur-sm transform -rotate-1 shadow-sm border-l border-r border-white/30 pointer-events-none" />
 
-      {/* Image Area */}
-      <div className="relative aspect-[4/3] bg-stone-800 overflow-hidden border-4 border-white shadow-inner mb-3">
+      <div className="relative bg-stone-800 overflow-hidden border-4 border-white shadow-inner mb-3" style={{ aspectRatio: data.aspect === '16:9' ? '16 / 9' : data.aspect === '9:16' ? '9 / 16' : '1 / 1' }}>
         {data.imageUrl ? (
           <img
             src={data.imageUrl}
@@ -83,8 +82,6 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
             <span className="text-xs">NO IMAGE</span>
           </div>
         )}
-        
-        {/* Connection Handle Overlay */}
         {isConnectionMode && (
           <div className="absolute inset-0 flex items-center justify-center bg-blue-500/10 pointer-events-none">
             <div className="w-4 h-4 bg-blue-500 rounded-full animate-ping" />

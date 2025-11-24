@@ -53,7 +53,7 @@ const App: React.FC = () => {
 
   // --- Actions ---
 
-  const addCard = (text: string, date: string, imageFile: File | null) => {
+  const addCard = (text: string, date: string, imageFile: File | null, aspect: '1:1' | '16:9' | '9:16') => {
     const id = generateId();
     
     // Place card in the center of the current viewport
@@ -78,6 +78,7 @@ const App: React.FC = () => {
       text,
       date,
       isTyping: true,
+      aspect,
     };
 
     setCards((prev) => [...prev, newCard]);
